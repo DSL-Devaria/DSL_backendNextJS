@@ -3,8 +3,8 @@ import { conectarBancoDB } from "@/middlewares/conectaBancoDB";
 import type {RespostaPadraoMsg} from '../../types/respostaPadraoMsg'
 import type { LoginResposta } from "@/types/LoginResposta";
 import { UsuarioModel } from "@/models/usuarioModel";
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 const endpointLogin = async (
     req: NextApiRequest,
