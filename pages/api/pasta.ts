@@ -5,6 +5,9 @@ import AutentiqueApiService from "@/services/autentiqueApiService";
 import fs from 'fs';
 import utils from '@/autentique/resources/utils'
 import multer from 'multer';
+import { UsuarioModel } from "@/models/usuarioModel";
+import { validarTokenJwt } from "@/middlewares/validarTokenJWT";
+import { conectarBancoDB } from "@/middlewares/conectaBancoDB";
 
 const AutentiqueService = new AutentiqueApiService();
 
@@ -15,11 +18,15 @@ const upload = multer({ storage: storage });
 
 const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
   .use(upload.single('file'))
- 
+
   .post(async (req: NextApiRequest | any, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
-      const { AUTENTIQUE_TOKEN, AUTENTIQUE_DEV_MODE } = process.env;
-      console.log('body', req?.body)
+      const { userId } = req.query;
+      const usuarioLogado = await UsuarioModel.findById(userId);
+      if (!usuarioLogado) {
+        return res.status(400).json({ erro: 'Usuario não encontrado!' })
+      }
+      const token = usuarioLogado.autentique;
       const { folderName } = req?.body;
 
       const variables = {
@@ -36,12 +43,11 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         .replace('$variables', JSON.stringify(variables))
 
       const formData = (utils.query(operations))
-      console.log('envio', formData)
 
-      const response = await AutentiqueService.post(formData);
-      console.log('resposta', response)
 
-      return res.status(200).json(response.data)//(responseCreate)
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data)
+
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel criar a pasta' });
@@ -51,10 +57,14 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
   .get(async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
-      const { pastaId,page } = req?.query;
-      const { AUTENTIQUE_TOKEN, AUTENTIQUE_DEV_MODE } = process.env;
+      const { userId } = req.query;
+      const usuarioLogado = await UsuarioModel.findById(userId);
+      if (!usuarioLogado) {
+        return res.status(400).json({ erro: 'Usuario não encontrado!' })
+      }
+      const token = usuarioLogado.autentique;
+      const { pastaId, page } = req?.query;
 
-      
       const filename = pastaId ? './autentique/resources/folders/listById.graphql' : './autentique/resources/folders/listAll.graphql';
 
       const operations = fs.readFileSync(filename)
@@ -64,12 +74,10 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         .replace('$folderId', pastaId)
 
       const formData = (utils.query(operations))
-      console.log('file name: ', formData)
 
 
-      const response = await AutentiqueService.post(formData);
-      console.log('resposta', response)
 
+      const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
 
     } catch (e) {
@@ -81,6 +89,12 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
   .put(async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
+      const { userId } = req.query;
+      const usuarioLogado = await UsuarioModel.findById(userId);
+      if (!usuarioLogado) {
+        return res.status(400).json({ erro: 'Usuario não encontrado!' })
+      }
+      const token = usuarioLogado.autentique;
       const { docId, pastaId } = req?.query;
 
       const filename = './autentique/resources/folders/moveDocumentById.graphql'
@@ -91,8 +105,8 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         .replace('$documentId', docId)
       const formData = (utils.query(operations))
 
-      console.log('file name: ', formData)
-      const response = await AutentiqueService.post(formData);
+
+      const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
 
     } catch (e) {
@@ -103,6 +117,12 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
   .delete(async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
+      const { userId } = req.query;
+      const usuarioLogado = await UsuarioModel.findById(userId);
+      if (!usuarioLogado) {
+        return res.status(400).json({ erro: 'Usuario não encontrado!' })
+      }
+      const token = usuarioLogado.autentique;
       const { pastaId } = req?.query;
 
       const filename = './autentique/resources/folders/deleteById.graphql'
@@ -112,7 +132,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         .replace('$folderId', pastaId)
       const formData = (utils.query(operations))
 
-      const response = await AutentiqueService.post(formData);
+      const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
 
     } catch (e) {
@@ -128,4 +148,4 @@ export const config = {
   }
 }
 
-export default router.handler();
+export default validarTokenJwt(conectarBancoDB(router.handler()));

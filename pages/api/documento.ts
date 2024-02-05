@@ -7,6 +7,9 @@ import fs from 'fs';
 import utils from '@/autentique/resources/utils'
 import axios from "axios";
 import FormData from "form-data";
+import { validarTokenJwt } from "@/middlewares/validarTokenJWT";
+import { conectarBancoDB } from "@/middlewares/conectaBancoDB";
+import { UsuarioModel } from "@/models/usuarioModel";
 
 const storage = multer.memoryStorage();
 const AutentiqueService = new AutentiqueApiService();
@@ -15,41 +18,18 @@ const upload = multer({ storage: storage });
 
 const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
   .use(upload.single('file'))
-  
-  /* para usar o sdk do thigo instalar e importar:
-
-  import autentique from '@thiago.zampieri/autentique-v2-nodejs';
-  
-  .post(async (req: NextApiRequest | any, res: NextApiResponse<RespostaPadraoMsg | any>) => {
-     try {
-       const { AUTENTIQUE_TOKEN, AUTENTIQUE_DEV_MODE } = process.env;
-       autentique.token = AUTENTIQUE_TOKEN;
-       autentique.sandbox = AUTENTIQUE_DEV_MODE;
-       const { signers, docName, fileUrl } = req.body;
- 
-       const attributes = {
-         document: { name: docName },
-         signers: signers,
-         filename: req?.file?.originalname,
-         file: req?.file?.buffer
-       }
-       
-       const responseCreate = await autentique.document.create(attributes);
-       return res.status(200).json(responseCreate)
-     } catch (e) {
-       console.log(e);
-       return res.status(400).json({ erro: 'Não foi possivel cadastrar documento' });
-     }
- 
-   })
-   */
-
   .post(async (req: NextApiRequest | any, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
       // para teste
       const { AUTENTIQUE_DEV_MODE } = process.env;
       const sandbox = AUTENTIQUE_DEV_MODE;
 
+      const { userId } = req.query; console.log('userId', userId)
+      const usuarioLogado = await UsuarioModel.findById(userId);
+      if (!usuarioLogado) {
+        return res.status(400).json({ erro: 'Usuario não encontrado!' })
+      }
+      const token = usuarioLogado.autentique;
       const { signers, docName, fileUrl } = req.body;
       const originalFileName = req?.file?.originalname;
 
@@ -82,10 +62,9 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         contentType: 'application/octet-stream',
       })
 
-      const response = await AutentiqueService.postData(formData);
-      console.log('resposta', response)
-
+      const response = await AutentiqueService.postData(token, formData);
       return res.status(response.status).json(response.data)
+
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel cadastrar documento' });
@@ -100,12 +79,17 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const { AUTENTIQUE_DEV_MODE } = process.env;
       const sandbox = AUTENTIQUE_DEV_MODE;
 
-      //const usuario = await UsuarioModel.findById(userId);
-
+      const { userId } = req.query;
+      const usuarioLogado = await UsuarioModel.findById(userId);
+      if (!usuarioLogado) {
+        return res.status(400).json({ erro: 'Usuario não encontrado!' })
+      }
+      const token = usuarioLogado.autentique;
       const { pastaId, docId, page } = req?.query;
 
 
-      const filename = docId ? './autentique/resources/documents/listById.graphql' : (pastaId ? './autentique/resources/folders/listDocumentsById.graphql' : './autentique/resources/documents/listAll.graphql');
+      const filename = docId ? './autentique/resources/documents/listById.graphql' : 
+      (pastaId ? './autentique/resources/folders/listDocumentsById.graphql' : './autentique/resources/documents/listAll.graphql');
 
       const operations = fs.readFileSync(filename)
         .toString()
@@ -116,10 +100,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         .replace('$sandbox', sandbox.toString())
       const formData = (utils.query(operations))
 
-      console.log('file name: ', formData)
-
-      const response = await AutentiqueService.post(formData);
-      console.log('resposta', response)
+      const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
 
     } catch (e) {
@@ -131,6 +112,13 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
   .put(async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
+
+      const { userId } = req.query;
+      const usuarioLogado = await UsuarioModel.findById(userId);
+      if (!usuarioLogado) {
+        return res.status(400).json({ erro: 'Usuario não encontrado!' })
+      }
+      const token = usuarioLogado.autentique;
       const { docId } = req?.query;
 
       const filename = './autentique/resources/documents/signById.graphql'
@@ -139,9 +127,8 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         .replace(/[\n\r]/gi, '')
         .replace('$documentId', docId)
       const formData = (utils.query(operations))
-      console.log('file name: ', formData)
 
-      const response = await AutentiqueService.post(formData);
+      const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
 
     } catch (e) {
@@ -152,6 +139,12 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
   .delete(async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
+      const { userId } = req.query;
+      const usuarioLogado = await UsuarioModel.findById(userId);
+      if (!usuarioLogado) {
+        return res.status(400).json({ erro: 'Usuario não encontrado!' })
+      }
+      const token = usuarioLogado.autentique;
       const { docId } = req?.query;
 
       const filename = './autentique/resources/documents/deleteById.graphql'
@@ -161,8 +154,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         .replace('$documentId', docId)
       const formData = (utils.query(operations))
 
-
-      const response = await AutentiqueService.post(formData);
+      const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
 
     } catch (e) {
@@ -178,4 +170,4 @@ export const config = {
   }
 }
 
-export default router.handler();
+export default validarTokenJwt(conectarBancoDB(router.handler()));
