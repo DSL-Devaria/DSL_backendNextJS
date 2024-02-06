@@ -8,6 +8,7 @@ import multer from 'multer';
 import { UsuarioModel } from "@/models/usuarioModel";
 import { validarTokenJwt } from "@/middlewares/validarTokenJWT";
 import { conectarBancoDB } from "@/middlewares/conectaBancoDB";
+import { politicaCORS } from "@/middlewares/politicaCORS";
 
 const AutentiqueService = new AutentiqueApiService();
 
@@ -148,4 +149,4 @@ export const config = {
   }
 }
 
-export default validarTokenJwt(conectarBancoDB(router.handler()));
+export default politicaCORS(validarTokenJwt(conectarBancoDB(router.handler())));

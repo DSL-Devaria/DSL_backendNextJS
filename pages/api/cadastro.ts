@@ -4,6 +4,7 @@ import type { CadastroUsusarioRequisicao } from "@/types/CadastroUsuarioRequisic
 import  {conectarBancoDB} from '../../middlewares/conectaBancoDB'
 import {UsuarioModel} from '../../models/usuarioModel'
 import bcrypt from 'bcrypt'
+import { politicaCORS } from "../../middlewares/politicaCORS";
 
 const endpointCadastro = async (
     req: NextApiRequest,
@@ -56,4 +57,4 @@ const endpointCadastro = async (
     }
     return res.status(405).json({erro : 'Métodos relatados inválidos'})
 }
-export default conectarBancoDB(endpointCadastro)
+export default politicaCORS(conectarBancoDB(endpointCadastro)) 

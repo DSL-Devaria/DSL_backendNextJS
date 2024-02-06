@@ -5,6 +5,7 @@ import type { LoginResposta } from "@/types/LoginResposta";
 import { UsuarioModel } from "@/models/usuarioModel";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { politicaCORS } from "@/middlewares/politicaCORS";
 
 const endpointLogin = async (
     req: NextApiRequest,
@@ -44,4 +45,4 @@ const endpointLogin = async (
     return res.status(405).json({ erro: 'Método informado não é válido' });
   }
   
-  export default conectarBancoDB(endpointLogin);
+  export default politicaCORS(conectarBancoDB(endpointLogin));
