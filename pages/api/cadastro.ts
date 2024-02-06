@@ -4,6 +4,7 @@ import type { CadastroUsusarioRequisicao } from "@/types/CadastroUsuarioRequisic
 import  {conectarBancoDB} from '../../middlewares/conectaBancoDB'
 import {UsuarioModel} from '../../models/usuarioModel'
 import bcrypt from 'bcrypt'
+import { politicaCORS } from "../../middlewares/politicaCORS";
 
 const endpointCadastro = async (
     req: NextApiRequest,
@@ -21,17 +22,14 @@ const endpointCadastro = async (
         const IssoEvalido: boolean = validarEmail(usuario.email)
 
         if (!IssoEvalido) {
-            return res.status(400).json({ erro: 'E-mail Não é válido!' })
+            return res.status(400).json({ erro: 'E-mail não é válido!' })
         }
         
-        if(!usuario.dataNascimento){
-            return res.status(400).json({ erro: 'Data de Nascimento Não!' })
-        }
-        if(!usuario.sexo){
-            return res.status(400).json({ erro: 'Sexo Não é informado!' })
-        }
         if (!usuario.senha || usuario.senha.length < 4) {
-            return res.status(400).json({ erro: 'Senha Não é válida!' })
+            return res.status(400).json({ erro: 'Senha não é válida!' })
+        }
+        if (!usuario.autentique || usuario.autentique.length < 10){
+            return res.status(400).json({ erro: 'Token Autentique não é válido!' })
         }
         const usuarioComMesmoEmail = await UsuarioModel.find({email: usuario.email})
         if(usuarioComMesmoEmail && usuarioComMesmoEmail.length > 0){
@@ -40,13 +38,14 @@ const endpointCadastro = async (
         
         //  salvar No banco de dados
         try{
-            const hashedPassword = await bcrypt.hash(usuario.senha, 10)
+            const hashedPassword = await bcrypt.hash(usuario.senha, 10);
+            
             const  salvarUsuario = {
                 nome:usuario.nome,
                 email:usuario.email,
                 senha: hashedPassword,
-                dataNascimento: usuario.dataNascimento,
-                sexo: usuario.sexo
+                autentique:usuario.autentique
+               
             }
             await UsuarioModel.create(salvarUsuario)
             return res.status(200).json({msg: 'Usuário criado com sucesso'})
@@ -58,4 +57,4 @@ const endpointCadastro = async (
     }
     return res.status(405).json({erro : 'Métodos relatados inválidos'})
 }
-export default conectarBancoDB(endpointCadastro)
+export default politicaCORS(conectarBancoDB(endpointCadastro)) 
