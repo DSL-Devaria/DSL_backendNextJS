@@ -89,8 +89,44 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const { pastaId, docId } = req?.query;
       const page = '1';
       
+      if(docId){
+        const filename = './autentique/resources/documents/listById.graphql'
+        const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+        .replace('$documentId', docId)
+        .replace('$sandbox', sandbox.toString())
+      const formData = (utils.query(operations))
 
-      const filename = docId ? './autentique/resources/documents/listById.graphql' : 
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);
+      }else if(pastaId){
+        const filename = './autentique/resources/folders/listDocumentsById.graphql'
+        const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+        .replace('$folderId', pastaId)
+        .replace('$sandbox', sandbox.toString())
+      const formData = (utils.query(operations))
+
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);
+      }else{
+        const filename = './autentique/resources/documents/listAll.graphql'
+        const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+        .replace('$sandbox', sandbox.toString())
+      const formData = (utils.query(operations))
+
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);
+      }
+
+      /*const filename = docId ? './autentique/resources/documents/listById.graphql' : 
       (pastaId ? './autentique/resources/folders/listDocumentsById.graphql' : './autentique/resources/documents/listAll.graphql');
 
       const operations = fs.readFileSync(filename)
@@ -104,7 +140,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
-
+*/
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter lista de documentos' });
