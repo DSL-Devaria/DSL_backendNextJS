@@ -103,12 +103,13 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
       }else if(pastaId){
+        const folderId = pastaId.toString();
         const filename = './autentique/resources/folders/listDocumentsById.graphql'
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
         .replace('$page', page )
-        .replace('$folderId', pastaId)
+        .replace('$folderId', folderId)
         .replace('$sandbox', sandbox.toString())
       const formData = (utils.query(operations))
 
