@@ -190,11 +190,12 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const token = usuarioLogado.autentique;
       const { docId } = req?.query;
       if(docId){
+        const documentId = docId.toString();
       const filename = './autentique/resources/documents/deleteById.graphql'
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$documentId', docId)
+        .replace('$documentId', documentId)
       const formData = (utils.query(operations))
 
       const response = await AutentiqueService.post(token, formData);
