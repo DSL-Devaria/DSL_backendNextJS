@@ -160,6 +160,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId } = req?.query;
+      if(docId){
       const documentId = docId.toString();
 
       const filename = './autentique/resources/documents/signById.graphql'
@@ -171,6 +172,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
+    }
 
     } catch (e) {
       console.log(e);
