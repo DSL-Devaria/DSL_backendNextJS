@@ -86,8 +86,9 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         return res.status(400).json({ erro: 'Usuario não encontrado!' })
       }
       const token = usuarioLogado.autentique;
-      const { pastaId, docId, page } = req?.query;
-
+      const { pastaId, docId } = req?.query;
+      let {page} =req?.query;
+      if(!page){page='1'}
 
       const filename = docId ? './autentique/resources/documents/listById.graphql' : 
       (pastaId ? './autentique/resources/folders/listDocumentsById.graphql' : './autentique/resources/documents/listAll.graphql');
@@ -95,7 +96,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$page', page ? page : '1')
+        .replace('$page', page )
         .replace('$documentId', docId)
         .replace('$folderId', pastaId)
         .replace('$sandbox', sandbox.toString())
