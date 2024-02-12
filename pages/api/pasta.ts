@@ -67,13 +67,13 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const { pastaId } = req?.query;
       const page ='1';
 
-      const filename = pastaId ? './autentique/resources/folders/listById.graphql' : './autentique/resources/folders/listAll.graphql';
-
-      const operations = fs.readFileSync(filename)
+      if(pastaId){
+        const filename= './autentique/resources/folders/listById.graphql';
+        const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
         .replace('$page', page )
-        .replace('$folderId', pastaId!)
+        .replace('$folderId', pastaId)
 
       const formData = (utils.query(operations))
 
@@ -82,6 +82,35 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
 
+      }else{
+        const filename = './autentique/resources/folders/listAll.graphql';
+        const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+       
+
+      const formData = (utils.query(operations))
+
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
+      }
+      /*
+      const filename = pastaId ? './autentique/resources/folders/listById.graphql' : './autentique/resources/folders/listAll.graphql';
+
+      const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+        .replace('$folderId', pastaId)
+
+      const formData = (utils.query(operations))
+
+
+
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
+*/
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter lista de documentos' });
