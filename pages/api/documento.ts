@@ -189,17 +189,17 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId } = req?.query;
-
+      if(docId){
       const filename = './autentique/resources/documents/deleteById.graphql'
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$documentId', docId.toString())
+        .replace('$documentId', docId)
       const formData = (utils.query(operations))
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
-
+      }
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter dados do usuario' });
