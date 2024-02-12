@@ -90,13 +90,13 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const page = '1';
       
       if(docId){
-        const dosumentId = docId.toString();
+        const documentId = docId.toString();
         const filename = './autentique/resources/documents/listById.graphql'
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
         .replace('$page', page )
-        .replace('$documentId', dosumentId)
+        .replace('$documentId', documentId)
         .replace('$sandbox', sandbox.toString())
       const formData = (utils.query(operations))
 
@@ -160,12 +160,13 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId } = req?.query;
+      const documentId = docId.toString();
 
       const filename = './autentique/resources/documents/signById.graphql'
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$documentId', docId)
+        .replace('$documentId', documentId)
       const formData = (utils.query(operations))
 
       const response = await AutentiqueService.post(token, formData);
@@ -191,7 +192,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$documentId', docId)
+        .replace('$documentId', docId.toString())
       const formData = (utils.query(operations))
 
       const response = await AutentiqueService.post(token, formData);
