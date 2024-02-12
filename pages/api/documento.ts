@@ -87,8 +87,8 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { pastaId, docId } = req?.query;
-      let {page} =req?.query;
-      page ? page : '1';
+      const page = '1';
+      
 
       const filename = docId ? './autentique/resources/documents/listById.graphql' : 
       (pastaId ? './autentique/resources/folders/listDocumentsById.graphql' : './autentique/resources/documents/listAll.graphql');
