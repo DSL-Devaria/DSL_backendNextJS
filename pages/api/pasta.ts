@@ -159,12 +159,13 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { pastaId } = req?.query;
+      const folderId = pastaId.toString();
 
       const filename = './autentique/resources/folders/deleteById.graphql'
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$folderId', pastaId)
+        .replace('$folderId', folderId)
       const formData = (utils.query(operations))
 
       const response = await AutentiqueService.post(token, formData);
