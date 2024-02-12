@@ -68,12 +68,13 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const page ='1';
 
       if(pastaId){
+        const folderId = pastaId.toString();
         const filename= './autentique/resources/folders/listById.graphql';
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
         .replace('$page', page )
-        .replace('$folderId', pastaId)
+        .replace('$folderId', folderId)
 
       const formData = (utils.query(operations))
 
