@@ -90,12 +90,13 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const page = '1';
       
       if(docId){
+        const dosumentId = docId.toString();
         const filename = './autentique/resources/documents/listById.graphql'
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
         .replace('$page', page )
-        .replace('$documentId', docId)
+        .replace('$documentId', dosumentId)
         .replace('$sandbox', sandbox.toString())
       const formData = (utils.query(operations))
 
