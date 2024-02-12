@@ -159,6 +159,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { pastaId } = req?.query;
+      if(pastaId){
       const folderId = pastaId.toString();
 
       const filename = './autentique/resources/folders/deleteById.graphql'
@@ -170,7 +171,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
-
+      }
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter dados do usuario' });
