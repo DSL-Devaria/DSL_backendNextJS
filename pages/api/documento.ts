@@ -22,8 +22,8 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
   .post(async (req: NextApiRequest | any, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
       // para teste
-      const { AUTENTIQUE_DEV_MODE } = process.env;
-      const sandbox = AUTENTIQUE_DEV_MODE;
+      //const { AUTENTIQUE_DEV_MODE } = process.env;
+      const sandbox = true;//AUTENTIQUE_DEV_MODE;
 
       const { userId } = req.query; console.log('userId', userId)
       const usuarioLogado = await UsuarioModel.findById(userId);
@@ -77,8 +77,8 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
     try {
 
       // para testes
-      const { AUTENTIQUE_DEV_MODE } = process.env;
-      const sandbox = AUTENTIQUE_DEV_MODE;
+      //const { AUTENTIQUE_DEV_MODE } = process.env;
+      const sandbox = true;//AUTENTIQUE_DEV_MODE;
 
       const { userId } = req.query;
       const usuarioLogado = await UsuarioModel.findById(userId);
