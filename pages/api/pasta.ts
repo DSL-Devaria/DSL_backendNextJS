@@ -128,19 +128,22 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId, pastaId } = req?.query;
-
+      if(docId && pastaId){
+        const documentId= docId.toString();
+        const folderId = pastaId.toString();
+      
       const filename = './autentique/resources/folders/moveDocumentById.graphql'
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$folderId', pastaId)
-        .replace('$documentId', docId)
+        .replace('$folderId', folderId)
+        .replace('$documentId', documentId)
       const formData = (utils.query(operations))
 
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
-
+}
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter dados do usuario' });
