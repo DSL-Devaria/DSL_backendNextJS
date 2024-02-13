@@ -42,7 +42,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         file: null
       }
 
-      const filename = `./autentique/resources/documents/create.graphql`
+      const filename = `${__dirname}/../../../../autentique/resources/documents/create.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
