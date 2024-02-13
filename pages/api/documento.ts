@@ -91,7 +91,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       
       if(docId){
         const documentId = docId.toString();
-        const filename = './autentique/resources/documents/listById.graphql'
+        const filename = `${__dirname}/../../../../autentique/resources/documents/listById.graphql`
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -104,7 +104,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       return res.status(200).json(response.data);
       }else if(pastaId){
         const folderId = pastaId.toString();
-        const filename = './autentique/resources/folders/listDocumentsById.graphql'
+        const filename = `${__dirname}/../../../../autentique/resources/folders/listDocumentsById.graphql`
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -116,7 +116,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
       }else{
-        const filename = './autentique/resources/documents/listAll.graphql'
+        const filename = `${__dirname}/../../../../autentique/resources/documents/listAll.graphql`
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -163,7 +163,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       if(docId){
       const documentId = docId.toString();
 
-      const filename = './autentique/resources/documents/signById.graphql'
+      const filename = `${__dirname}/../../../../autentique/resources/documents/signById.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -191,7 +191,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const { docId } = req?.query;
       if(docId){
         const documentId = docId.toString();
-      const filename = './autentique/resources/documents/deleteById.graphql'
+      const filename = `${__dirname}/../../../../autentique/resources/documents/deleteById.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
