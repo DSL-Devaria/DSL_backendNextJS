@@ -37,7 +37,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
       }
 
-      const filename = `./autentique/resources/folders/create.graphql`
+      const filename = `${__dirname}/../../../../autentique/resources/folders/create.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -69,7 +69,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
       if(pastaId){
         const folderId = pastaId.toString();
-        const filename= './autentique/resources/folders/listById.graphql';
+        const filename= `${__dirname}/../../../../autentique/resources/folders/listById.graphql`;
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -84,7 +84,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
 
       }else{
-        const filename = './autentique/resources/folders/listAll.graphql';
+        const filename = `${__dirname}/../../../../autentique/resources/folders/listAll.graphql`;
         const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -132,7 +132,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         const documentId= docId.toString();
         const folderId = pastaId.toString();
       
-      const filename = './autentique/resources/folders/moveDocumentById.graphql'
+      const filename =  `${__dirname}/../../../../autentique/resources/folders/moveDocumentById.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -162,7 +162,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       if(pastaId){
       const folderId = pastaId.toString();
 
-      const filename = './autentique/resources/folders/deleteById.graphql'
+      const filename = `${__dirname}/../../../../autentique/resources/folders/deleteById.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
