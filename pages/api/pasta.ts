@@ -37,7 +37,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
       }
 
-      const filename = `./autentique/resources/folders/create.graphql`
+      const filename = `${__dirname}/../../../../autentique/resources/folders/create.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -64,15 +64,17 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         return res.status(400).json({ erro: 'Usuario não encontrado!' })
       }
       const token = usuarioLogado.autentique;
-      const { pastaId, page } = req?.query;
+      const { pastaId } = req?.query;
+      const page ='1';
 
-      const filename = pastaId ? './autentique/resources/folders/listById.graphql' : './autentique/resources/folders/listAll.graphql';
-
-      const operations = fs.readFileSync(filename)
+      if(pastaId){
+        const folderId = pastaId.toString();
+        const filename= `${__dirname}/../../../../autentique/resources/folders/listById.graphql`;
+        const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$page', page ? page : '1')
-        .replace('$folderId', pastaId)
+        .replace('$page', page )
+        .replace('$folderId', folderId)
 
       const formData = (utils.query(operations))
 
@@ -81,6 +83,35 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
 
+      }else{
+        const filename = `${__dirname}/../../../../autentique/resources/folders/listAll.graphql`;
+        const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+       
+
+      const formData = (utils.query(operations))
+
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
+      }
+      /*
+      const filename = pastaId ? './autentique/resources/folders/listById.graphql' : './autentique/resources/folders/listAll.graphql';
+
+      const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+        .replace('$folderId', pastaId)
+
+      const formData = (utils.query(operations))
+
+
+
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
+*/
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter lista de documentos' });
@@ -97,19 +128,22 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId, pastaId } = req?.query;
-
-      const filename = './autentique/resources/folders/moveDocumentById.graphql'
+      if(docId && pastaId){
+        const documentId= docId.toString();
+        const folderId = pastaId.toString();
+      
+      const filename =  `${__dirname}/../../../../autentique/resources/folders/moveDocumentById.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$folderId', pastaId)
-        .replace('$documentId', docId)
+        .replace('$folderId', folderId)
+        .replace('$documentId', documentId)
       const formData = (utils.query(operations))
 
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
-
+}
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter dados do usuario' });
@@ -125,17 +159,19 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { pastaId } = req?.query;
+      if(pastaId){
+      const folderId = pastaId.toString();
 
-      const filename = './autentique/resources/folders/deleteById.graphql'
+      const filename = `${__dirname}/../../../../autentique/resources/folders/deleteById.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$folderId', pastaId)
+        .replace('$folderId', folderId)
       const formData = (utils.query(operations))
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
-
+      }
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter dados do usuario' });

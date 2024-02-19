@@ -11,9 +11,9 @@ const endpointLogin = async (
     req: NextApiRequest,
     res: NextApiResponse<RespostaPadraoMsg | LoginResposta>
   ) => {
-    const { MINHA_CHAVE_JWT } = process.env
+    const { MINHA_CHAVE_JWT } = process.env;
     console.log(MINHA_CHAVE_JWT)
-    if (MINHA_CHAVE_JWT === undefined) {
+    if (!MINHA_CHAVE_JWT) {
       res.status(500).json({ erro: 'ENV jwt Não informado' })
     }
     if (req.method === 'POST') {
@@ -24,7 +24,7 @@ const endpointLogin = async (
           const senhaCorreta = await bcrypt.compare(senha, UsuarioEncontrado.senha);
           if (senhaCorreta) {
             const Usuario = UsuarioEncontrado; // Não é necessário o [0] se você já encontrou um usuário
-            const token = jwt.sign({ _id: Usuario._id }, MINHA_CHAVE_JWT)
+            const token = jwt.sign({ _id: Usuario._id }, MINHA_CHAVE_JWT!)
 
             // return res.status(200).json({ msg: `Usuário ${Usuario} encontrado com sucesso` });
             return res.status(200).json({

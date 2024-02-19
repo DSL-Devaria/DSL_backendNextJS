@@ -22,8 +22,8 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
   .post(async (req: NextApiRequest | any, res: NextApiResponse<RespostaPadraoMsg | any>) => {
     try {
       // para teste
-      const { AUTENTIQUE_DEV_MODE } = process.env;
-      const sandbox = AUTENTIQUE_DEV_MODE;
+      //const { AUTENTIQUE_DEV_MODE } = process.env;
+      const sandbox = true;//AUTENTIQUE_DEV_MODE;
 
       const { userId } = req.query; console.log('userId', userId)
       const usuarioLogado = await UsuarioModel.findById(userId);
@@ -42,7 +42,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         file: null
       }
 
-      const filename = `./autentique/resources/documents/create.graphql`
+      const filename = `${__dirname}/../../../../autentique/resources/documents/create.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
@@ -77,8 +77,8 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
     try {
 
       // para testes
-      const { AUTENTIQUE_DEV_MODE } = process.env;
-      const sandbox = AUTENTIQUE_DEV_MODE;
+      //const { AUTENTIQUE_DEV_MODE } = process.env;
+      const sandbox = true;//AUTENTIQUE_DEV_MODE;
 
       const { userId } = req.query;
       const usuarioLogado = await UsuarioModel.findById(userId);
@@ -86,16 +86,55 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
         return res.status(400).json({ erro: 'Usuario não encontrado!' })
       }
       const token = usuarioLogado.autentique;
-      const { pastaId, docId, page } = req?.query;
+      const { pastaId, docId } = req?.query;
+      const page = '1';
+      
+      if(docId){
+        const documentId = docId.toString();
+        const filename = `${__dirname}/../../../../autentique/resources/documents/listById.graphql`
+        const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+        .replace('$documentId', documentId)
+        .replace('$sandbox', sandbox.toString())
+      const formData = (utils.query(operations))
 
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);
+      }else if(pastaId){
+        const folderId = pastaId.toString();
+        const filename = `${__dirname}/../../../../autentique/resources/folders/listDocumentsById.graphql`
+        const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+        .replace('$folderId', folderId)
+        .replace('$sandbox', sandbox.toString())
+      const formData = (utils.query(operations))
 
-      const filename = docId ? './autentique/resources/documents/listById.graphql' : 
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);
+      }else{
+        const filename = `${__dirname}/../../../../autentique/resources/documents/listAll.graphql`
+        const operations = fs.readFileSync(filename)
+        .toString()
+        .replace(/[\n\r]/gi, '')
+        .replace('$page', page )
+        .replace('$sandbox', sandbox.toString())
+      const formData = (utils.query(operations))
+
+      const response = await AutentiqueService.post(token, formData);
+      return res.status(200).json(response.data);
+      }
+
+      /*const filename = docId ? './autentique/resources/documents/listById.graphql' : 
       (pastaId ? './autentique/resources/folders/listDocumentsById.graphql' : './autentique/resources/documents/listAll.graphql');
 
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$page', page ? page : '1')
+        .replace('$page', page )
         .replace('$documentId', docId)
         .replace('$folderId', pastaId)
         .replace('$sandbox', sandbox.toString())
@@ -103,7 +142,7 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
-
+*/
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter lista de documentos' });
@@ -121,16 +160,19 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId } = req?.query;
+      if(docId){
+      const documentId = docId.toString();
 
-      const filename = './autentique/resources/documents/signById.graphql'
+      const filename = `${__dirname}/../../../../autentique/resources/documents/signById.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$documentId', docId)
+        .replace('$documentId', documentId)
       const formData = (utils.query(operations))
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);
+    }
 
     } catch (e) {
       console.log(e);
@@ -147,17 +189,18 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId } = req?.query;
-
-      const filename = './autentique/resources/documents/deleteById.graphql'
+      if(docId){
+        const documentId = docId.toString();
+      const filename = `${__dirname}/../../../../autentique/resources/documents/deleteById.graphql`
       const operations = fs.readFileSync(filename)
         .toString()
         .replace(/[\n\r]/gi, '')
-        .replace('$documentId', docId)
+        .replace('$documentId', documentId)
       const formData = (utils.query(operations))
 
       const response = await AutentiqueService.post(token, formData);
       return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
-
+      }
     } catch (e) {
       console.log(e);
       return res.status(400).json({ erro: 'Não foi possivel obter dados do usuario' });
