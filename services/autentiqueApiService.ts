@@ -4,8 +4,8 @@ export default class AutentiqueApiService {
     axios: any;
     constructor() {
         this.axios = axios.create({
-           
-            baseURL: process.env.AUTENTIQUE_URL
+           // timeout: 1000,
+           baseURL: process.env.AUTENTIQUE_URL
           
         });
     }
