@@ -17,7 +17,7 @@ const endpointAutentique = async (
         
 
         // --------ABLY---------------
-       /* const { ABLY_API_KEY } = process.env;
+        const { ABLY_API_KEY } = process.env;
         const ably = new Ably.Realtime.Promise(`${ABLY_API_KEY}`);
 
         await ably.connection.once("connected");
@@ -32,7 +32,7 @@ const endpointAutentique = async (
 
         // Publish a message or two
         await channel.publish("webhook", WebhookData);
-*/
+
         return res.status(200).json(WebhookData)
     }
 }
