@@ -10,7 +10,7 @@ const endpointAutentique = async (
 
 
     if (req.method === 'POST') {
-        const WebhookData = JSON.parse(JSON.stringify(req.body))
+        const WebhookData = req.body//JSON.parse(JSON.stringify(req.body))
         console.log('webhook', WebhookData)
        // console.log('webhook teste docID', WebhookData.documento.uuid)
 
