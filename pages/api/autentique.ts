@@ -2,17 +2,46 @@ import { politicaCORS } from "@/middlewares/politicaCORS";
 import { RespostaPadraoMsg } from "@/types/respostaPadraoMsg";
 import { NextApiRequest, NextApiResponse } from "next";
 import Ably from 'ably'
+import url from 'querystring'
 
 const endpointAutentique = async (
     req: NextApiRequest,
     res: NextApiResponse<RespostaPadraoMsg | any>) => {
 
+        function transformToJSON(data) {
+            let result = {};
+        
+            for (let key in data) {
+                let keys = key.split('[').map(k => k.replace(']', ''));
+                let current = result;
+        
+                for (let i = 0; i < keys.length; i++) {
+                    let keyPart = keys[i];
+                    if (!(keyPart in current)) {
+                        if (i < keys.length - 1 && !isNaN(keys[i + 1])) {
+                            current[keyPart] = [];
+                        } else {
+                            current[keyPart] = {};
+                        }
+                    }
+                    if (i === keys.length - 1) {
+                        current[keyPart] = data[key];
+                    } else {
+                        current = current[keyPart];
+                    }
+                }
+            }
+        
+            return JSON.stringify(result, null, 4);
+        }
 
 
     if (req.method === 'POST') {
-        const WebhookData = JSON.parse(JSON.stringify(req.body))
+        const WebhookData = JSON.parse(transformToJSON(req.body))
+        const test = JSON.parse(transformToJSON(WebhookData))
+       
         console.log('webhook', WebhookData)
-        console.log('webhook teste docID', WebhookData.documento.uuid)
+        //console.log('webhook teste docID', WebhookData.documento.uuid)
 
         
 
@@ -32,6 +61,7 @@ const endpointAutentique = async (
 
         // Publish a message or two
         await channel.publish("webhook", WebhookData);
+        
 
         return res.status(200).json(WebhookData)
     }
