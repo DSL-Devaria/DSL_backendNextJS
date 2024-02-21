@@ -8,17 +8,15 @@ const endpointAutentique = async (
     req: NextApiRequest,
     res: NextApiResponse<RespostaPadraoMsg | any>) => {
 
-        function transformToJSON(data:any) {
-            let result = {};
-        
+        function transformToJSON(data: any): string {
+            let result: any = {};
             for (let key in data) {
                 let keys = key.split('[').map(k => k.replace(']', ''));
                 let current = result;
-        
                 for (let i = 0; i < keys.length; i++) {
                     let keyPart = keys[i];
                     if (!(keyPart in current)) {
-                        if (i < keys.length - 1 && !isNaN(keys[i + 1])) {
+                        if (i < keys.length - 1 && !Number.isNaN(Number(keys[i + 1]))) {
                             current[keyPart] = [];
                         } else {
                             current[keyPart] = {};
@@ -31,7 +29,6 @@ const endpointAutentique = async (
                     }
                 }
             }
-        
             return JSON.stringify(result, null, 4);
         }
 
@@ -56,7 +53,7 @@ const endpointAutentique = async (
                 assinado:WebhookData.arquivo.assinado
             },
         };
-        WebhookData.partes.forEach((parte: { uuid: any; nome: any; email: any; ordem: any; funcao: any; mail: any; visualizado: { created: any; }; assinado: { created: any; }; }) => {
+        WebhookData.partes.forEach((parte:any) => {
             WebhookDataSimplificada.partes.push({
                 id:parte.uuid,
                 nome:parte.nome,
