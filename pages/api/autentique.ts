@@ -8,7 +8,7 @@ const endpointAutentique = async (
     req: NextApiRequest,
     res: NextApiResponse<RespostaPadraoMsg | any>) => {
 
-        function transformToJSON(data) {
+        function transformToJSON(data:any) {
             let result = {};
         
             for (let key in data) {
@@ -56,7 +56,7 @@ const endpointAutentique = async (
                 assinado:WebhookData.arquivo.assinado
             },
         };
-        WebhookData.partes.forEach(parte => {
+        WebhookData.partes.forEach((parte: { uuid: any; nome: any; email: any; ordem: any; funcao: any; mail: any; visualizado: { created: any; }; assinado: { created: any; }; }) => {
             WebhookDataSimplificada.partes.push({
                 id:parte.uuid,
                 nome:parte.nome,
