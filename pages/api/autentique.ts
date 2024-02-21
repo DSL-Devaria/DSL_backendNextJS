@@ -38,10 +38,38 @@ const endpointAutentique = async (
 
     if (req.method === 'POST') {
         const WebhookData = JSON.parse(transformToJSON(req.body))
-        const test = JSON.parse(transformToJSON(WebhookData))
+        const WebhookDataSimplificada = {
+            partes:[],
+            documento:{
+                id: WebhookData.documento.uuid,
+                nome:WebhookData.documento.nome,
+                publicado:WebhookData.documento.publicado,
+                updated:WebhookData.documento.updated
+
+            },
+            remetente:{
+                nome: WebhookData.remetente.nome,
+                email: WebhookData.remetente.email
+            },
+            arquivo:{
+                original:WebhookData.arquivo.original,
+                assinado:WebhookData.arquivo.assinado
+            },
+        };
+        WebhookData.partes.forEach(parte => {
+            WebhookDataSimplificada.partes.push({
+                id:parte.uuid,
+                nome:parte.nome,
+                email:parte.email,
+                ordem:parte.ordem,
+                funcao: parte.funcao,
+                mail:parte.mail,
+                visualizado:parte.visualizado?.created,
+                assinado:parte.assinado?.created,
+            })
+        });
        
-        console.log('webhook', WebhookData)
-        //console.log('webhook teste docID', WebhookData.documento.uuid)
+        //console.log('webhook', WebhookDataSimplificada)
 
         
 
