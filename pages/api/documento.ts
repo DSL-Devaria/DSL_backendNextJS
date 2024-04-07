@@ -88,43 +88,91 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       const token = usuarioLogado.autentique;
       const { pastaId, docId } = req?.query;
       const page = '1';
-      
-      if(docId){
+
+      if (docId) {
         const documentId = docId.toString();
         const filename = `${__dirname}/../../../../autentique/resources/documents/listById.graphql`
         const operations = fs.readFileSync(filename)
-        .toString()
-        .replace(/[\n\r]/gi, '')
-        .replace('$page', page )
-        .replace('$documentId', documentId)
-        .replace('$sandbox', sandbox.toString())
-      const formData = (utils.query(operations))
+          .toString()
+          .replace(/[\n\r]/gi, '')
+          .replace('$page', page)
+          .replace('$documentId', documentId)
+          .replace('$sandbox', sandbox.toString())
+        const formData = (utils.query(operations))
 
-      const response = await AutentiqueService.post(token, formData);
-      return res.status(200).json(response.data);
-      }else if(pastaId){
+        const response = await AutentiqueService.post(token, formData);
+        if(response.data){
+        const docsList = response.data.data.document;
+        const docListClean = {
+            
+            id: docsList.id,
+            name: docsList.name,
+            created_at: docsList.created_at,
+            files: docsList.files,
+            assinaturas: docsList.signatures
+          };
+        
+        
+        console.log('doc.signatures:', docListClean)
+        return res.status(200).json(docListClean);
+        }
+        return res.status(200).json(response.data);
+      } else if (pastaId) {
         const folderId = pastaId.toString();
         const filename = `${__dirname}/../../../../autentique/resources/folders/listDocumentsById.graphql`
         const operations = fs.readFileSync(filename)
-        .toString()
-        .replace(/[\n\r]/gi, '')
-        .replace('$page', page )
-        .replace('$folderId', folderId)
-        .replace('$sandbox', sandbox.toString())
-      const formData = (utils.query(operations))
-
-      const response = await AutentiqueService.post(token, formData);
+          .toString()
+          .replace(/[\n\r]/gi, '')
+          .replace('$page', page)
+          .replace('$folderId', folderId)
+          .replace('$sandbox', sandbox.toString())
+        const formData = (utils.query(operations))
+        const response = await AutentiqueService.post(token, formData);
+        if(response.data){
+        const docsList = response.data.data.documentsByFolder.data;
+        const docListClean: any[] = [];
+        docsList.forEach((doc: any) => {
+          docListClean.push({
+            id: doc.id,
+            name: doc.name,
+            created_at: doc.created_at,
+            files: doc.files,
+            assinaturas: doc.signatures
+          });
+        });
+        
+        console.log('doc.signatures:', docListClean)
+        return res.status(200).json(docListClean);
+      }
       return res.status(200).json(response.data);
-      }else{
+
+      } else {
         const filename = `${__dirname}/../../../../autentique/resources/documents/listAll.graphql`
         const operations = fs.readFileSync(filename)
-        .toString()
-        .replace(/[\n\r]/gi, '')
-        .replace('$page', page )
-        .replace('$sandbox', sandbox.toString())
-      const formData = (utils.query(operations))
+          .toString()
+          .replace(/[\n\r]/gi, '')
+          .replace('$page', page)
+          .replace('$sandbox', sandbox.toString())
+        const formData = (utils.query(operations))
 
-      const response = await AutentiqueService.post(token, formData);
+        const response = await AutentiqueService.post(token, formData);
+
+        if(response.data){
+        const docsList = response.data.data.documents.data;
+        const docListClean: any[] = [];
+        docsList.forEach((doc: any) => {
+          docListClean.push({
+            id: doc.id,
+            name: doc.name,
+            created_at: doc.created_at,
+            files: doc.files,
+            assinaturas: doc.signatures
+          });
+        });
+
+        console.log('doc.signatures:', docListClean)
+        return res.status(200).json(docListClean);
+      }
       return res.status(200).json(response.data);
       }
 
@@ -160,19 +208,19 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId } = req?.query;
-      if(docId){
-      const documentId = docId.toString();
+      if (docId) {
+        const documentId = docId.toString();
 
-      const filename = `${__dirname}/../../../../autentique/resources/documents/signById.graphql`
-      const operations = fs.readFileSync(filename)
-        .toString()
-        .replace(/[\n\r]/gi, '')
-        .replace('$documentId', documentId)
-      const formData = (utils.query(operations))
+        const filename = `${__dirname}/../../../../autentique/resources/documents/signById.graphql`
+        const operations = fs.readFileSync(filename)
+          .toString()
+          .replace(/[\n\r]/gi, '')
+          .replace('$documentId', documentId)
+        const formData = (utils.query(operations))
 
-      const response = await AutentiqueService.post(token, formData);
-      return res.status(200).json(response.data);
-    }
+        const response = await AutentiqueService.post(token, formData);
+        return res.status(200).json(response.data);
+      }
 
     } catch (e) {
       console.log(e);
@@ -189,17 +237,17 @@ const router = createRouter<NextApiRequest | any, NextApiResponse | any>()
       }
       const token = usuarioLogado.autentique;
       const { docId } = req?.query;
-      if(docId){
+      if (docId) {
         const documentId = docId.toString();
-      const filename = `${__dirname}/../../../../autentique/resources/documents/deleteById.graphql`
-      const operations = fs.readFileSync(filename)
-        .toString()
-        .replace(/[\n\r]/gi, '')
-        .replace('$documentId', documentId)
-      const formData = (utils.query(operations))
+        const filename = `${__dirname}/../../../../autentique/resources/documents/deleteById.graphql`
+        const operations = fs.readFileSync(filename)
+          .toString()
+          .replace(/[\n\r]/gi, '')
+          .replace('$documentId', documentId)
+        const formData = (utils.query(operations))
 
-      const response = await AutentiqueService.post(token, formData);
-      return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
+        const response = await AutentiqueService.post(token, formData);
+        return res.status(200).json(response.data);//{msg: 'Usuario autenticado com sucesso'});
       }
     } catch (e) {
       console.log(e);
